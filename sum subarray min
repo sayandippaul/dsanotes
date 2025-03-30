@@ -1,0 +1,156 @@
+# **📌 Sum of Subarray Minimums – Notes**  
+
+The **Sum of Subarray Minimums** problem requires us to **find the sum of the minimum element in every possible subarray** of an array.
+
+---
+
+## **🔹 Approach**
+1. **Find Previous Smaller Element (PSE):**  
+   - Stores the **index of the nearest smaller element to the left** for each element.
+   - If no smaller element exists, store `-1`.
+
+2. **Find Next Smaller Element (NSE):**  
+   - Stores the **index of the nearest smaller element to the right** for each element.
+   - If no smaller element exists, store `n` (size of array).
+
+3. **Calculate Contribution of Each Element:**  
+   - **Each element contributes as the minimum of several subarrays.**
+   - Number of subarrays where `arr[i]` is the minimum:  
+     - **Left Contribution** = `i - PSE[i]`
+     - **Right Contribution** = `NSE[i] - i`
+   - **Total contribution of `arr[i]`**:  
+     \[
+     (i - PSE[i]) \times (NSE[i] - i) \times arr[i]
+     \]
+   - Sum all contributions.
+
+---
+
+## **🔹 Code Explanation**
+```cpp
+class Solution {
+public:
+    const int prime = 1e9+7; // To handle large numbers (modulo constraint)
+
+    // Function to find Previous Smaller Element (PSE)
+    vector<int> findPSE(vector<int>& a) {
+        stack<int> st;
+        int n = a.size();
+        vector<int> pse(n);
+        
+        for (int i = 0; i < n; i++) {
+            while (!st.empty() && a[st.top()] >= a[i]) {
+                st.pop();
+            }
+            pse[i] = st.empty() ? -1 : st.top(); // Store index of previous smaller element
+            st.push(i);
+        }
+        return pse;
+    }
+
+    // Function to find Next Smaller Element (NSE)
+    vector<int> findNSE(vector<int>& a) {
+        int n = a.size();
+        stack<int> st;
+        vector<int> nse(n);
+
+        for (int i = n - 1; i >= 0; i--) {
+            while (!st.empty() && a[st.top()] > a[i]) {
+                st.pop();
+            }
+            nse[i] = st.empty() ? n : st.top(); // Store index of next smaller element
+            st.push(i);
+        }
+        return nse;
+    }
+
+    // Function to calculate sum of subarray minimums
+    int sumSubarrayMins(vector<int>& a) {
+        int n = a.size();
+        vector<int> nse = findNSE(a);
+        vector<int> pse = findPSE(a);
+        int total = 0;
+
+        for (int i = 0; i < n; i++) {
+            long long left = i - pse[i];  // Number of subarrays ending at i where a[i] is min
+            long long right = nse[i] - i; // Number of subarrays starting at i where a[i] is min
+            total = (total + (left * right * 1LL * a[i]) % prime) % prime;
+        }
+        return total;
+    }
+};
+```
+
+---
+
+## **🔹 Key Observations**
+✅ **Use Monotonic Stack** → Efficiently finds **previous & next smaller elements** in `O(N)`.  
+✅ **PSE & NSE help in counting subarrays where an element is the minimum.**  
+✅ **Each element's contribution is calculated using PSE & NSE values.**  
+✅ **Modulo `1e9+7` is used to prevent integer overflow.**  
+
+---
+
+## **🔹 Complexity Analysis**
+| Operation        | Time Complexity  | Space Complexity |
+|-----------------|-----------------|------------------|
+| Finding PSE     | **O(N)** | **O(N)** |
+| Finding NSE     | **O(N)** | **O(N)** |
+| Calculating Sum | **O(N)** | **O(1)** |
+| **Total**       | **O(N)** | **O(N)** |
+
+---
+
+## **🔹 Example Walkthrough**
+**Input:**  
+```cpp
+arr = [3, 1, 2, 4]
+```
+### **Step 1: Compute PSE (Previous Smaller Element)**
+```
+Index:   0   1   2   3
+Array:   3   1   2   4
+PSE:    -1  -1   1   2
+```
+- `pse[i]` stores **the nearest smaller element index on the left**.
+
+### **Step 2: Compute NSE (Next Smaller Element)**
+```
+Index:   0   1   2   3
+Array:   3   1   2   4
+NSE:     1   4   4   4
+```
+- `nse[i]` stores **the nearest smaller element index on the right**.
+
+### **Step 3: Compute Contribution for Each Element**
+\[
+\text{Total Sum} = \sum (i - PSE[i]) \times (NSE[i] - i) \times arr[i]
+\]
+```
+For i = 0: (0 - (-1)) * (1 - 0) * 3 = 1 * 1 * 3 = 3
+For i = 1: (1 - (-1)) * (4 - 1) * 1 = 2 * 3 * 1 = 6
+For i = 2: (2 - 1) * (4 - 2) * 2 = 1 * 2 * 2 = 4
+For i = 3: (3 - 2) * (4 - 3) * 4 = 1 * 1 * 4 = 4
+```
+**Output:**  
+\[
+3 + 6 + 4 + 4 = 17
+\]
+
+---
+
+## **🔹 Applications of This Concept**
+✅ **Trapping Rain Water** → Similar approach using `prefixMax` and `suffixMax`.  
+✅ **Sliding Window Minimum** → Find min in every subarray of size `k`.  
+✅ **Largest Rectangle in Histogram** → Uses `NSE` & `PSE` to find rectangle area efficiently.  
+✅ **Stock Span Problem** → Uses `PSE` to determine span of stock prices.
+
+---
+
+## **🔹 Key Takeaways**
+💡 **Use a stack to efficiently find Previous Smaller Element (PSE) & Next Smaller Element (NSE).**  
+💡 **Each element contributes as the minimum to several subarrays, which we count using PSE & NSE.**  
+💡 **Modulo `1e9+7` prevents integer overflow in large inputs.**  
+💡 **Optimized to `O(N)` time complexity, making it very efficient!**
+
+🚀 **Mastering this approach helps in many range-based problems!** Let me know if you need further clarification. 😊
