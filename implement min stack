@@ -1,0 +1,80 @@
+Min Stack Implementation in C++
+A Min Stack is a special stack that supports the following operations in O(1) time complexity:
+
+push(x) – Push element x onto the stack.
+
+pop() – Remove the top element from the stack.
+
+top() – Get the top element.
+
+getMin() – Retrieve the minimum element in the stack.
+
+Code Explanation
+cpp
+Copy
+Edit
+class MinStack {
+public:
+    stack<pair<int, int>> st;  // Stack stores (value, min_value)
+
+    MinStack() {}
+
+    void push(int v) {
+        if (st.empty()) 
+            st.push({v, v});  // If empty, min is the element itself
+        else {
+            int currentMin = min(v, st.top().second); // Compare with current min
+            st.push({v, currentMin});
+        }
+    }
+
+    void pop() {
+        if (!st.empty()) 
+            st.pop();
+    }
+
+    int top() {
+        return st.top().first;  // Return the top element
+    }
+
+    int getMin() {
+        return st.top().second;  // Return the minimum element
+    }
+};
+Key Points & Approach
+✅ Use a Stack of Pairs
+
+Each element stores (value, min_value_so_far).
+
+This allows getMin() in O(1) time.
+
+✅ Push Operation
+
+If the stack is empty, push {value, value}.
+
+Otherwise, store {value, min(value, current_min)}.
+
+✅ Pop Operation
+
+Simply remove the top element.
+
+✅ Top Operation
+
+Return st.top().first.
+
+✅ getMin() Operation
+
+Return st.top().second, which stores the minimum so far.
+
+Time Complexity
+Push: O(1)
+
+Pop: O(1)
+
+Top: O(1)
+
+getMin: O(1)
+
+Memory Trick to Remember Approach
+🔹 Think of an Extra Min Tracker
+Each time you push, store the minimum so far, so you never have to traverse the stack.
