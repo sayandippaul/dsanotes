@@ -204,3 +204,178 @@ int main() {
 
 This structured approach will help you understand and **memorize** expression conversions easily! 🚀
 
+
+
+# **Expression Conversion Notes**
+
+## **1. Expression Types**
+### **1.1 Infix Expression:**
+- Operators are written between operands.
+- Example: `A + B`
+- **Easy to read but requires parentheses to specify precedence.**
+
+### **1.2 Prefix Expression (Polish Notation):**
+- Operators appear before operands.
+- Example: `+ A B`
+- **Eliminates the need for parentheses.**
+
+### **1.3 Postfix Expression (Reverse Polish Notation - RPN):**
+- Operators appear after operands.
+- Example: `A B +`
+- **Easier for computation (used in stack-based evaluation).**
+
+---
+
+## **2. Conversion Techniques**
+
+### **2.1 Infix to Postfix Conversion**
+#### **Code (C++)**:
+```cpp
+bool isop(char a){
+    return (a=='/' || a=='*' || a=='+' || a=='-' || a=='^' || a=='%');
+}
+
+int prio(char a){
+    if(a=='+' || a=='-') return 1;
+    if(a=='*' || a=='/') return 2;
+    if(a=='^') return 3;
+    return -1;
+}
+
+string infixToPostfix(string& s) {
+    string ans="";
+    stack<char> st;
+    int i=0;
+    while(i<s.size()){
+         if(isalnum(s[i])){
+             ans += s[i];
+         } 
+         else if(s[i]=='('){
+             st.push(s[i]);
+         }
+         else if(s[i]==')'){
+             while(!st.empty() && st.top()!='('){
+                 ans += st.top();
+                 st.pop();
+             }
+             st.pop();
+         }
+         else{
+            while(!st.empty() && prio(s[i]) <= prio(st.top())){
+                ans += st.top();
+                st.pop();
+            }
+            st.push(s[i]);
+         }
+        i++;      
+    }
+    while(!st.empty()){
+         ans += st.top();
+         st.pop();
+     }
+     return ans;
+}
+```
+#### **Key Points:**
+- Use a stack to handle operators and precedence.
+- Operators pop when precedence is lower or equal.
+- Parentheses help in priority management.
+
+#### **Memory Trick:**
+- **"Operands go straight, operators wait!"**
+
+---
+
+### **2.2 Postfix to Infix Conversion**
+#### **Code (C++)**:
+```cpp
+string postToInfix(string s) {
+    stack<string> st;
+    for (char c : s) {
+        if (isalnum(c)) {
+            st.push(string(1, c));
+        } else {
+            string a = st.top(); st.pop();
+            string b = st.top(); st.pop();
+            st.push("(" + b + c + a + ")");
+        }
+    }
+    return st.top();
+}
+```
+#### **Key Points:**
+- Read operands, push to stack.
+- Pop two operands when an operator appears.
+- Push back the formed expression.
+
+#### **Memory Trick:**
+- **"Operands first, operator in between!"**
+
+---
+
+### **2.3 Postfix to Prefix Conversion**
+#### **Code (C++)**:
+```cpp
+string postToPre(string s) {
+    stack<string> st;
+    for (char c : s) {
+        if (isalnum(c)) {
+            st.push(string(1, c));
+        } else {
+            string a = st.top(); st.pop();
+            string b = st.top(); st.pop();
+            st.push(c + b + a);
+        }
+    }
+    return st.top();
+}
+```
+#### **Key Points:**
+- Similar to Postfix to Infix, but **operators are placed first**.
+
+#### **Memory Trick:**
+- **"Reverse order of operations!"**
+
+---
+
+### **2.4 Prefix to Infix Conversion**
+#### **Code (C++)**:
+```cpp
+string preToInfix(string s) {
+    int i = s.size() - 1;
+    stack<string> st;
+    while(i >= 0) {
+        if (isalnum(s[i])) {
+            st.push(string(1, s[i]));
+        } else {
+            string a = st.top(); st.pop();
+            string b = st.top(); st.pop();
+            st.push("(" + a + s[i] + b + ")");
+        }
+        i--;
+    }
+    return st.top();
+}
+```
+#### **Key Points:**
+- **Process from right to left.**
+- **Same rule as Postfix to Infix.**
+
+#### **Memory Trick:**
+- **"Right to left, insert operator in middle!"**
+
+---
+
+### **Final Comparison Table**
+| **Conversion**       | **Algorithm**                                      | **Key Trick** |
+|----------------------|----------------------------------------------------|--------------|
+| Infix → Postfix     | Stack-based precedence                              | Operands go first! |
+| Postfix → Infix     | Stack, pop two, insert operator in between         | Operands first, operator in between! |
+| Prefix → Infix      | Stack, right to left, pop two, insert operator     | Right to left, insert operator in middle! |
+| Infix → Prefix      | Reverse, swap `(`/`)`, convert to postfix, reverse | Reverse, swap, postfix, reverse! |
+| Prefix → Postfix    | Stack, right to left, pop two, push back           | Right to left, postfix formation! |
+| Postfix → Prefix    | Stack, left to right, pop two, push back           | Left to right, prefix formation! |
+
+This structured approach will help you understand and **memorize** expression conversions easily! 🚀
+
+
