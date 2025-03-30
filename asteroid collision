@@ -1,0 +1,117 @@
+# **📌 Asteroid Collision – Notes**  
+
+The **Asteroid Collision** problem involves a sequence of asteroids moving in space. Each asteroid has a **size** and a **direction**:
+- **Positive (`>0`)** → Moves **right**  
+- **Negative (`<0`)** → Moves **left**  
+
+If two asteroids **collide** (one moving right, one moving left), the **larger** asteroid survives, and the smaller one gets destroyed. If they are **equal in size**, both are destroyed.
+
+---
+
+## **🔹 Approach**
+✅ **Use a Stack** to keep track of asteroids moving to the right (`>0`).  
+✅ **Iterate through the array** and handle each asteroid based on its direction:  
+   - If **positive (`>0`)**, push it to the stack.
+   - If **negative (`<0`)**, check for collisions with positive asteroids in the stack:
+     - If **stack top is smaller**, pop it.
+     - If **stack top is equal**, pop both.
+     - If **stack is empty or has a negative asteroid**, push the new asteroid.
+
+---
+
+## **🔹 Code Explanation**
+```cpp
+class Solution {
+public:
+    vector<int> asteroidCollision(vector<int>& arr) {
+        stack<int> st;
+        
+        for (int i = 0; i < arr.size(); i++) {
+            // If the asteroid is moving right, push it into the stack
+            if (arr[i] > 0) {
+                st.push(arr[i]);
+                continue;
+            }
+
+            // Handle collision when an asteroid moves left
+            while (!st.empty() && st.top() > 0 && abs(arr[i]) > st.top()) {
+                st.pop();  // Destroy smaller asteroid
+            }
+
+            // If equal sizes, destroy both
+            if (!st.empty() && st.top() == abs(arr[i])) {
+                st.pop();
+            }
+            // If stack is empty or top is negative, push asteroid
+            else if (st.empty() || st.top() < 0) {
+                st.push(arr[i]);
+            }
+        }
+
+        // Convert stack to result array
+        vector<int> ans(st.size(), 0);
+        for (int i = st.size() - 1; i >= 0; i--) {
+            ans[i] = st.top();
+            st.pop();
+        }
+        
+        return ans;
+    }
+};
+```
+
+---
+
+## **🔹 Key Observations**
+✅ **Collisions happen only when a positive asteroid meets a negative one**  
+✅ **Use `while` loop to keep removing smaller asteroids**  
+✅ **If stack is empty or has a negative asteroid, push the new one**  
+
+---
+
+## **🔹 Complexity Analysis**
+| Operation | Time Complexity | Space Complexity |
+|-----------|---------------|----------------|
+| Traversing array | **O(N)** | **O(N)** (stack) |
+
+---
+
+## **🔹 Example Walkthrough**
+### **Example 1**
+#### **Input:**  
+```cpp
+arr = [5, 10, -5]
+```
+#### **Step-by-Step Execution:**
+```
+Stack:  [5]    // 5 is moving right
+Stack:  [5, 10]  // 10 is moving right
+-5 comes → Collides with 10 (10 wins)
+Final Stack: [5, 10]
+```
+#### **Output:** `[5, 10]`
+
+---
+
+### **Example 2**
+#### **Input:**  
+```cpp
+arr = [8, -8]
+```
+#### **Step-by-Step Execution:**
+```
+Stack:  [8]  
+-8 comes → Collides with 8 (Both are destroyed)
+Final Stack: []
+```
+#### **Output:** `[]`
+
+---
+
+## **🔹 Key Takeaways**
+💡 **Stack helps track asteroids efficiently**  
+💡 **Collisions happen only with `+` and `-` asteroids**  
+💡 **Use `while` loop to check if current asteroid should be destroyed**  
+💡 **If stack is empty after collision, push the new asteroid**  
+
+🚀 **Mastering this pattern helps solve similar collision-based problems!** Let me know if you need more clarifications. 😊
