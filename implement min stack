@@ -78,3 +78,109 @@ getMin: O(1)
 Memory Trick to Remember Approach
 🔹 Think of an Extra Min Tracker
 Each time you push, store the minimum so far, so you never have to traverse the stack.
+
+
+
+
+
+
+
+
+
+
+### **Min Stack Using a Single Stack and a Variable (`mini`)**  
+
+This implementation optimizes space by using a **single stack** (`st`) and a **global variable** (`mini`) to store the minimum element efficiently. Instead of using an auxiliary stack, we **encode the minimum element in the stack itself**.
+
+---
+
+## **How This Works?**
+### **Push Operation**
+1. **If the stack is empty:**  
+   - Push `val` directly.  
+   - Set `mini = val`.  
+2. **If `val` is greater than `mini`:**  
+   - Push `val` normally.  
+3. **If `val` is smaller than `mini`:**  
+   - Push **a special encoded value**: `2 * val - mini`.  
+   - Update `mini = val`.  
+   - This ensures we can recover the previous `mini` when popping.
+
+### **Pop Operation**
+1. **If `st.top() > mini`** → Normal pop.  
+2. **If `st.top() <= mini`**:  
+   - The top is the **encoded value**.  
+   - Restore `mini` using: `mini = 2 * mini - st.top()`.  
+   - Then pop the stack.
+
+### **Top Operation**
+1. **If `st.top() > mini`** → Return `st.top()`.  
+2. **Else, return `mini`** (since `mini` holds the actual top value for encoded elements).
+
+### **Get Min Operation**
+- Simply return `mini`, which always stores the current minimum.
+
+---
+
+## **Optimized Code**
+```cpp
+class MinStack {
+public:
+    stack<long long> st;  // Using long long to prevent overflow issues
+    long long mini = 1e9; // Stores the minimum element
+
+    MinStack() {}
+
+    void push(int val) {
+        if (st.empty()) {
+            st.push(val);
+            mini = val;
+        } else {
+            if (val > mini) {
+                st.push(val); // Push normally if val > mini
+            } else {
+                st.push(2 * val - mini); // Encode the old min value
+                mini = val; // Update mini to new min
+            }
+        }
+    }
+
+    void pop() {
+        if (st.top() > mini) {
+            st.pop(); // Normal pop if top is not encoded
+        } else {
+            mini = 2 * mini - st.top(); // Restore previous mini
+            st.pop();
+        }
+    }
+
+    int top() {
+        if (st.top() > mini) 
+            return st.top();
+        return mini; // If encoded, return mini
+    }
+
+    int getMin() {
+        return mini;
+    }
+};
+```
+
+---
+
+## **Key Points & Memory Trick**
+✅ **Single Stack Approach** → Uses **encoding trick** instead of an extra stack.  
+✅ **Encoding Formula**:  
+   - `2 * val - mini` (used to encode `mini` into the stack).  
+   - `mini = 2 * mini - st.top()` (used to recover the old `mini`).  
+✅ **Constant Time (`O(1)`) Operations** → Push, Pop, Top, and getMin all run in `O(1)`.  
+✅ **Space Optimized** → Uses only one stack.
+
+---
+
+## **Why This Works?**
+The trick behind `2 * val - mini` ensures that we can always **recover the previous minimum** when popping, without storing extra elements.
+
+---
+
+🚀 **This is the most optimized space-efficient solution for Min Stack!** Let me know if you need more explanation.
