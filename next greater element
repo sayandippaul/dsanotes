@@ -1,0 +1,71 @@
+### **📌 Next Greater Element (NGE) – Using Stack (Right to Left Approach)**  
+
+The **Next Greater Element (NGE)** for an element in an array is the first greater element **to its right**. If no such element exists, store `-1`.  
+
+---
+
+## **🔹 Approach (Using Stack – Start from Back)**
+1. **Traverse from Right to Left** (Reverse Order).
+2. **Use a Stack (`st`)** to keep track of elements.
+3. **For Each Element `arr[i]`:**
+   - Remove elements from the stack **smaller or equal** to `arr[i]` (they can't be NGE).
+   - If stack is empty → No greater element exists, store `-1`.
+   - Otherwise, **stack’s top is the Next Greater Element**.
+   - Push `arr[i]` to the stack.
+
+---
+
+## **🔹 Code Implementation**
+```cpp
+vector<int> nextGreaterElement(vector<int>& arr) {
+    int n = arr.size();
+    vector<int> nge(n, -1); // Initialize with -1
+    stack<int> st;          // Stack to store elements
+
+    for (int i = n - 1; i >= 0; i--) {  // Traverse from back
+        // Remove smaller elements
+        while (!st.empty() && st.top() <= arr[i]) {
+            st.pop();
+        }
+
+        // If stack is not empty, top is the NGE
+        if (!st.empty()) nge[i] = st.top();
+
+        // Push current element to stack
+        st.push(arr[i]);
+    }
+    
+    return nge;
+}
+```
+
+---
+
+## **🔹 Key Observations**
+✅ **Stack maintains a decreasing order** from right to left.  
+✅ **Elements smaller than `arr[i]` are useless** (we remove them).  
+✅ **Efficient `O(N)` Complexity** → Each element is pushed and popped **only once**.  
+✅ **Using `vector<int> nge(n, -1);` ensures correct default values**.
+
+---
+
+## **🔹 Dry Run Example**
+**Input:** `arr = [4, 5, 2, 25]`  
+**Step-by-Step Execution:**  
+```
+1. i = 3, arr[i] = 25 → Stack Empty → nge[3] = -1 → Push(25)
+2. i = 2, arr[i] = 2  → Stack Top(25) > 2 → nge[2] = 25 → Push(2)
+3. i = 1, arr[i] = 5  → Pop(2) → Stack Top(25) > 5 → nge[1] = 25 → Push(5)
+4. i = 0, arr[i] = 4  → Stack Top(5) > 4 → nge[0] = 5 → Push(4)
+```
+**Output:** `[5, 25, 25, -1]`
+
+---
+
+## **🔹 Memory Trick to Remember**
+💡 **"Start from Back, Keep a Stack"**  
+💡 **"Pop smaller elements, top is NGE!"**  
+
+---
+
+🚀 **This is the most optimized way to find Next Greater Element!** Let me know if you need further explanation. 😊
