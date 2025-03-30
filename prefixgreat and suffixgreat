@@ -1,0 +1,94 @@
+# **📌 Prefix Greatest & Suffix Greatest – Notes**  
+
+The **Prefix Greatest** and **Suffix Greatest** are commonly used in range-based problems like **Trapping Rain Water**, **Sliding Window Maximum**, etc.  
+
+---
+
+## **🔹 Prefix Greatest (PrefixMax)**
+### **What is it?**
+- The **prefix greatest** array stores the **maximum element from the start (left)** up to the current index.  
+- **PrefixMax[i]** represents the **maximum** of all elements from index `0` to `i`.
+
+### **🔹 Approach**
+1. **Initialize `prefixMax[0] = arr[0]`** (first element is the max so far).
+2. **Traverse from Left to Right**:
+   - `prefixMax[i] = max(prefixMax[i - 1], arr[i])`
+   - This ensures each index stores the **maximum seen so far**.
+
+### **🔹 Code**
+```cpp
+vector<int> prefixGreatest(vector<int>& arr) {
+    int n = arr.size();
+    vector<int> prefixMax(n);
+    
+    prefixMax[0] = arr[0];  // First element remains same
+    for (int i = 1; i < n; i++) {
+        prefixMax[i] = max(prefixMax[i - 1], arr[i]);
+    }
+    
+    return prefixMax;
+}
+```
+### **🔹 Example**
+#### **Input:** `[2, 5, 1, 7, 3]`  
+#### **Prefix Max Calculation:**
+```
+Index:   0   1   2   3   4
+Array:   2   5   1   7   3
+Prefix:  2   5   5   7   7
+```
+#### **Output:** `[2, 5, 5, 7, 7]`
+
+---
+
+## **🔹 Suffix Greatest (SuffixMax)**
+### **What is it?**
+- The **suffix greatest** array stores the **maximum element from the end (right)** up to the current index.  
+- **SuffixMax[i]** represents the **maximum** of all elements from index `i` to `n-1`.
+
+### **🔹 Approach**
+1. **Initialize `suffixMax[n-1] = arr[n-1]`** (last element is max so far).
+2. **Traverse from Right to Left**:
+   - `suffixMax[i] = max(suffixMax[i + 1], arr[i])`
+   - This ensures each index stores the **maximum seen from the right**.
+
+### **🔹 Code**
+```cpp
+vector<int> suffixGreatest(vector<int>& arr) {
+    int n = arr.size();
+    vector<int> suffixMax(n);
+    
+    suffixMax[n - 1] = arr[n - 1];  // Last element remains same
+    for (int i = n - 2; i >= 0; i--) {
+        suffixMax[i] = max(suffixMax[i + 1], arr[i]);
+    }
+    
+    return suffixMax;
+}
+```
+### **🔹 Example**
+#### **Input:** `[2, 5, 1, 7, 3]`  
+#### **Suffix Max Calculation:**
+```
+Index:   0   1   2   3   4
+Array:   2   5   1   7   3
+Suffix:  7   7   7   7   3
+```
+#### **Output:** `[7, 7, 7, 7, 3]`
+
+---
+
+## **🔹 Applications of Prefix & Suffix Greatest**
+✅ **Trapping Rain Water** → `min(prefixMax[i], suffixMax[i]) - arr[i]`  
+✅ **Sliding Window Maximum** → Using `prefixMax` in chunks  
+✅ **Finding Largest Element in Ranges** → Used in **range queries**  
+✅ **Stock Span Problem** → Prefix max helps find max stock price till today  
+
+---
+
+## **🔹 Key Takeaways**
+💡 **PrefixMax** → Stores max from the **left to right**  
+💡 **SuffixMax** → Stores max from the **right to left**  
+💡 **Both run in `O(N)` time** using simple loops  
+
+🚀 **Mastering these concepts helps solve many range-based problems!** Let me know if you need more explanations. 😊
