@@ -1,0 +1,140 @@
+# **📌 Subarray Ranges – Notes**  
+
+This problem requires calculating the **sum of subarray ranges** in an array.  
+For each subarray, the **range** is defined as:  
+\[
+\text{Range} = \text{Maximum element} - \text{Minimum element}
+\]
+We aim to **sum up the ranges for all subarrays** efficiently.
+
+---
+
+## **🔹 Approach**  
+✅ **Use Monotonic Stacks** to efficiently find**:  
+1. **Previous Smaller Element (PSE)**
+2. **Next Smaller Element (NSE)**
+3. **Previous Greater Element (PGE)**
+4. **Next Greater Element (NGE)**  
+
+✅ **Calculate how many times each element contributes as min & max**  
+✅ **Compute the total sum based on contributions**  
+
+---
+
+## **🔹 Code Explanation**
+```cpp
+class Solution {
+public:
+    long long subArrayRanges(vector<int>& arr) {
+        int n = arr.size();
+        vector<int> pse(n, -1);  // Previous Smaller Element
+        vector<int> nse(n, n);   // Next Smaller Element
+        vector<int> pge(n, -1);  // Previous Greater Element
+        vector<int> nge(n, n);   // Next Greater Element
+
+        stack<int> st;
+
+        // Finding Previous Smaller Element (PSE)
+        for (int i = 0; i < n; i++) {
+            while (!st.empty() && arr[st.top()] >= arr[i]) {
+                st.pop();
+            }
+            pse[i] = st.empty() ? -1 : st.top();
+            st.push(i);
+        }
+
+        while (!st.empty()) st.pop();
+
+        // Finding Next Smaller Element (NSE)
+        for (int i = n - 1; i >= 0; i--) {
+            while (!st.empty() && arr[st.top()] > arr[i]) {
+                st.pop();
+            }
+            nse[i] = st.empty() ? n : st.top();
+            st.push(i);
+        }
+
+        while (!st.empty()) st.pop();
+
+        // Finding Previous Greater Element (PGE)
+        for (int i = 0; i < n; i++) {
+            while (!st.empty() && arr[st.top()] <= arr[i]) {
+                st.pop();
+            }
+            pge[i] = st.empty() ? -1 : st.top();
+            st.push(i);
+        }
+
+        while (!st.empty()) st.pop();
+
+        // Finding Next Greater Element (NGE)
+        for (int i = n - 1; i >= 0; i--) {
+            while (!st.empty() && arr[st.top()] < arr[i]) {
+                st.pop();
+            }
+            nge[i] = st.empty() ? n : st.top();
+            st.push(i);
+        }
+
+        // Calculate the sum of subarray ranges
+        long long ans = 0;
+        for (int i = 0; i < n; i++) {
+            int leftMin = i - pse[i], rightMin = nse[i] - i;
+            int leftMax = i - pge[i], rightMax = nge[i] - i;
+
+            ans += (rightMax * leftMax * 1LL * arr[i]) - (leftMin * rightMin * 1LL * arr[i]);
+        }
+
+        return ans;
+    }
+};
+```
+
+---
+
+## **🔹 Key Observations**  
+💡 **Each element contributes as both min & max in different subarrays.**  
+💡 **Using stacks reduces complexity from O(N²) to O(N).**  
+💡 **To count how many times an element is min/max in a subarray:**  
+   - **PSE & NSE** help determine contribution as a **minimum**  
+   - **PGE & NGE** help determine contribution as a **maximum**  
+
+---
+
+## **🔹 Complexity Analysis**  
+| Operation | Time Complexity | Space Complexity |
+|-----------|---------------|----------------|
+| Finding PSE/NSE/PGE/NGE | **O(N)** | **O(N)** (Stack + Arrays) |
+| Computing Answer | **O(N)** | **O(1)** |
+| **Total** | **O(N)** | **O(N)** |
+
+---
+
+## **🔹 Example Walkthrough**  
+### **Example 1**
+#### **Input:**  
+```cpp
+arr = [1, 3, 2]
+```
+#### **Step-by-Step Execution:**
+1. Compute **PSE, NSE, PGE, NGE**  
+   ```
+   PSE: [-1,  0,  0]  
+   NSE: [ 3,  2,  3]  
+   PGE: [-1, -1,  1]  
+   NGE: [ 1,  3,  3]
+   ```
+2. Calculate the contribution of each element  
+   ```
+   Total sum of ranges = (sum of max elements) - (sum of min elements)
+   ```
+#### **Output:** `4`
+
+---
+
+## **🔹 Key Takeaways**  
+✅ **Stack helps efficiently compute next & previous elements.**  
+✅ **Each element’s contribution is calculated separately.**  
+✅ **This approach generalizes well for similar problems.**  
+
+🚀 **Mastering this pattern helps in problems involving subarrays & monotonic stacks!** Let me know if you need more explanations. 😊
