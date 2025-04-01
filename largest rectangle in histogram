@@ -1,0 +1,116 @@
+# **📌 Largest Rectangle in Histogram – Notes**  
+
+The problem requires us to find the **largest rectangular area** in a histogram, where the heights of bars are given in an array.
+
+---
+
+## **🔹 Approach (Using Next & Previous Smaller Elements)**
+✅ **Use the Next Smaller Element (NSE) & Previous Smaller Element (PSE)** to determine the width of the largest rectangle that each bar can form.  
+✅ **Formula for Width** = `nse[i] - pse[i] - 1`  
+✅ **Formula for Area** = `height[i] * width`  
+✅ **Use a Monotonic Stack** to efficiently find NSE and PSE in **O(N) time**.
+
+---
+
+## **🔹 Code Explanation**
+```cpp
+class Solution {
+public:
+    int largestRectangleArea(vector<int>& arr) {
+        int n = arr.size();
+        stack<int> st;
+        vector<int> pse(n, -1); // Stores Previous Smaller Element indices
+        vector<int> nse(n, n);  // Stores Next Smaller Element indices
+
+        // Step 1: Compute PSE (Previous Smaller Element)
+        for (int i = 0; i < n; i++) {
+            while (!st.empty() && arr[st.top()] >= arr[i]) {
+                st.pop();
+            }
+            pse[i] = st.empty() ? -1 : st.top();
+            st.push(i);
+        }
+
+        // Clear stack for next computation
+        while (!st.empty()) st.pop();
+
+        // Step 2: Compute NSE (Next Smaller Element)
+        for (int i = n - 1; i >= 0; i--) {
+            while (!st.empty() && arr[st.top()] >= arr[i]) {
+                st.pop();
+            }
+            nse[i] = st.empty() ? n : st.top();
+            st.push(i);
+        }
+
+        // Step 3: Compute Maximum Area
+        int maxArea = 0;
+        for (int i = 0; i < n; i++) {
+            int width = nse[i] - pse[i] - 1; // Width of the rectangle
+            maxArea = max(maxArea, arr[i] * width);
+        }
+
+        return maxArea;
+    }
+};
+```
+
+---
+
+## **🔹 Key Observations**
+💡 **Each bar is expanded to its left and right until a smaller bar is found.**  
+💡 **Using PSE and NSE helps efficiently calculate the width of the rectangle at each index.**  
+💡 **A Monotonic Stack is ideal for finding NSE and PSE in O(N) time complexity.**  
+
+---
+
+## **🔹 Complexity Analysis**
+| Operation | Time Complexity | Space Complexity |
+|-----------|---------------|----------------|
+| Finding PSE | **O(N)** | **O(N)** (Stack + Array) |
+| Finding NSE | **O(N)** | **O(N)** (Stack + Array) |
+| Computing Max Area | **O(N)** | **O(1)** |
+
+⏳ **Total Complexity: O(N) ✅**
+
+---
+
+## **🔹 Example Walkthrough**
+### **Example 1**
+#### **Input:**  
+```cpp
+arr = [2, 1, 5, 6, 2, 3]
+```
+#### **Step-by-Step Execution:**
+- **PSE (Previous Smaller Element indices):** `[-1, -1, 1, 2, 1, 4]`
+- **NSE (Next Smaller Element indices):** `[1, 6, 4, 4, 6, 6]`
+- **Widths:**  
+  ```
+  Width[0] = (1 - (-1) - 1) = 1
+  Width[1] = (6 - (-1) - 1) = 6
+  Width[2] = (4 - 1 - 1) = 2
+  Width[3] = (4 - 2 - 1) = 1
+  Width[4] = (6 - 1 - 1) = 4
+  Width[5] = (6 - 4 - 1) = 1
+  ```
+- **Areas:**  
+  ```
+  Area[0] = 2 * 1 = 2
+  Area[1] = 1 * 6 = 6
+  Area[2] = 5 * 2 = 10
+  Area[3] = 6 * 1 = 6
+  Area[4] = 2 * 4 = 8
+  Area[5] = 3 * 1 = 3
+  ```
+- **Maximum Area:** `10`
+
+#### **Output:** `10`
+
+---
+
+## **🔹 Key Takeaways**
+✅ **Stack helps in efficiently determining the NSE and PSE.**  
+✅ **The width of the largest rectangle is calculated using `nse[i] - pse[i] - 1`.**  
+✅ **Final answer is the maximum area found among all bars.**  
+
+🚀 **This technique is useful in many stack-based problems involving range queries!** Let me know if you need more clarifications. 😊
