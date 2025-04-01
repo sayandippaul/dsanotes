@@ -1,0 +1,200 @@
+# **📌 Maximal Rectangle – Full Notes**  
+
+The **Maximal Rectangle** problem asks us to find the largest rectangle of `1`s in a binary matrix (`0`s and `1`s).  
+
+✅ We can solve this problem using two approaches:  
+1. **Using Dynamic Programming (DP)**
+2. **Using Stack (Largest Histogram Approach)**  
+
+---
+
+## **🔹 Approach 1: Dynamic Programming (DP)**
+### **🛠 Idea**
+We can think of the matrix as multiple histograms stacked on top of each other.  
+- Convert each row into a histogram of consecutive `1`s.
+- Use **Dynamic Programming (DP) Arrays** to track maximum height and find the maximum area.
+
+### **🚀 DP Arrays**
+1. `height[i][j]`: Number of consecutive `1`s **above** (including current cell).
+2. `left[i][j]`: Leftmost column index that can form a rectangle.
+3. `right[i][j]`: Rightmost column index that can form a rectangle.
+
+### **📝 Algorithm**
+1. **Initialize DP arrays:**
+   - `height = 0` for all `0`s, else `height[i][j] = height[i-1][j] + 1`
+   - `left[i][j] = max(left[i-1][j], leftmost index of 1s)`
+   - `right[i][j] = min(right[i-1][j], rightmost index of 1s)`
+
+2. **For each row, compute the largest area** using:
+   \[
+   \text{width} = \text{right}[i][j] - \text{left}[i][j]
+   \]
+   \[
+   \text{area} = \text{height}[i][j] \times \text{width}
+   \]
+
+---
+
+### **🔹 Code: DP Approach**
+```cpp
+class Solution {
+public:
+    int maximalRectangle(vector<vector<char>>& matrix) {
+        if(matrix.empty()) return 0;
+        int n = matrix.size(), m = matrix[0].size();
+        vector<int> left(m, 0), right(m, m), height(m, 0);
+        int maxArea = 0;
+
+        for(int i = 0; i < n; i++) {
+            int leftBound = 0, rightBound = m;
+
+            // Compute height
+            for(int j = 0; j < m; j++) {
+                if(matrix[i][j] == '1') height[j]++;
+                else height[j] = 0;
+            }
+
+            // Compute left boundaries
+            for(int j = 0; j < m; j++) {
+                if(matrix[i][j] == '1') left[j] = max(left[j], leftBound);
+                else { left[j] = 0; leftBound = j + 1; }
+            }
+
+            // Compute right boundaries
+            for(int j = m - 1; j >= 0; j--) {
+                if(matrix[i][j] == '1') right[j] = min(right[j], rightBound);
+                else { right[j] = m; rightBound = j; }
+            }
+
+            // Compute area
+            for(int j = 0; j < m; j++) {
+                maxArea = max(maxArea, height[j] * (right[j] - left[j]));
+            }
+        }
+        return maxArea;
+    }
+};
+```
+
+---
+
+## **🔹 Approach 2: Stack (Using Largest Histogram)**
+### **🛠 Idea**
+- **Convert each row into a histogram.**  
+- **Find the largest rectangular area for each row using the largest histogram technique.**
+
+### **🚀 Steps**
+1. **Convert matrix row-wise into histogram heights**  
+   - `height[j] = height[j] + 1` if `matrix[i][j] == 1`
+   - Otherwise, `height[j] = 0`
+  
+2. **Apply Largest Rectangle in Histogram Algorithm**  
+   - For each row, use **Next Smaller Element (NSE) and Previous Smaller Element (PSE)** to compute the maximum area.
+
+---
+
+### **🔹 Code: Stack Approach**
+```cpp
+class Solution {
+public:
+    int largestRectangleArea(vector<int>& heights) {
+        stack<int> st;
+        int n = heights.size(), maxArea = 0;
+        vector<int> pse(n, -1), nse(n, n);
+
+        // Finding Previous Smaller Element (PSE)
+        for (int i = 0; i < n; i++) {
+            while (!st.empty() && heights[st.top()] >= heights[i]) {
+                st.pop();
+            }
+            pse[i] = st.empty() ? -1 : st.top();
+            st.push(i);
+        }
+
+        // Clear stack
+        while (!st.empty()) st.pop();
+
+        // Finding Next Smaller Element (NSE)
+        for (int i = n - 1; i >= 0; i--) {
+            while (!st.empty() && heights[st.top()] >= heights[i]) {
+                st.pop();
+            }
+            nse[i] = st.empty() ? n : st.top();
+            st.push(i);
+        }
+
+        // Compute maximum area
+        for (int i = 0; i < n; i++) {
+            int width = nse[i] - pse[i] - 1;
+            maxArea = max(maxArea, heights[i] * width);
+        }
+        return maxArea;
+    }
+
+    int maximalRectangle(vector<vector<char>>& matrix) {
+        if (matrix.empty()) return 0;
+        int n = matrix.size(), m = matrix[0].size();
+        vector<int> heights(m, 0);
+        int maxArea = 0;
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (matrix[i][j] == '1') heights[j]++;
+                else heights[j] = 0;
+            }
+            maxArea = max(maxArea, largestRectangleArea(heights));
+        }
+        return maxArea;
+    }
+};
+```
+
+---
+
+## **🔹 Complexity Analysis**
+| **Approach** | **Time Complexity** | **Space Complexity** |
+|-------------|-----------------|----------------|
+| **Dynamic Programming** | O(N × M) | O(M) |
+| **Stack (Histogram Approach)** | O(N × M) | O(M) |
+
+---
+
+## **🔹 Example Walkthrough**
+### **Example**
+#### **Input:**
+```cpp
+matrix = {
+  {'1', '0', '1', '0', '0'},
+  {'1', '0', '1', '1', '1'},
+  {'1', '1', '1', '1', '1'},
+  {'1', '0', '0', '1', '0'}
+};
+```
+#### **Step-by-Step Execution**
+1. **Convert each row into a histogram:**
+   ```
+   Row 0: [1, 0, 1, 0, 0]
+   Row 1: [2, 0, 2, 1, 1]
+   Row 2: [3, 1, 3, 2, 2]
+   Row 3: [4, 0, 0, 3, 0]
+   ```
+
+2. **Apply Largest Histogram Area Calculation**
+   ```
+   Row 0 → Max Rectangle Area = 1
+   Row 1 → Max Rectangle Area = 3
+   Row 2 → Max Rectangle Area = 6
+   Row 3 → Max Rectangle Area = 4
+   ```
+
+✅ **Final Answer:** **6**
+
+---
+
+## **🔹 Key Takeaways**
+✅ **Dynamic Programming (DP) Approach** is **efficient** and works by tracking height, left, and right boundaries.  
+✅ **Stack (Histogram Approach)** is more intuitive and builds upon the **Largest Rectangle in Histogram** problem.  
+✅ **Stack Approach is simpler but slightly slower than DP.**  
+✅ **Both approaches run in O(N × M) time complexity.**  
+
+🚀 **This problem is an extension of the Largest Histogram problem and is useful in many grid-based DP problems!**
