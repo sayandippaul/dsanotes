@@ -1,0 +1,98 @@
+# **📌 Sliding Window Maximum – Full Notes**  
+
+The **Sliding Window Maximum** problem requires us to find the maximum value in every **contiguous subarray of size `k`** in a given array.  
+
+---
+
+## **🔹 Problem Statement**  
+Given an array `arr` of size `n` and a window size `k`, return a list where each element represents the **maximum** of all subarrays of length `k`.  
+
+---
+
+## **🔹 Approach: Using Deque (Optimized Approach)**
+### **🛠 Idea**
+Instead of recalculating the maximum for each window (which would be O(N*K) in brute force), we use a **Deque (double-ended queue)** to efficiently maintain the indices of maximum elements.
+
+### **🚀 Steps**
+1. **Maintain a Deque** that stores indices of elements in decreasing order.
+2. **For each new element `arr[i]`:**
+   - Remove elements **out of the window** from the front (`st.front() <= i-k`).
+   - Remove **smaller elements from the back** (`arr[st.back()] <= arr[i]`).
+   - Push the **current index** to the deque.
+   - If `i >= k-1`, store the **maximum** (`arr[st.front()]`) in the answer.
+
+---
+
+### **🔹 Code: Using Deque**
+```cpp
+class Solution {
+public:
+    vector<int> maxSlidingWindow(vector<int>& arr, int k) {
+        deque<int> st;
+        vector<int> ans;
+
+        for(int i = 0; i < arr.size(); i++) {
+            // Remove elements out of the window
+            if (!st.empty() && st.front() <= i - k) 
+                st.pop_front();
+
+            // Remove all smaller elements from the back
+            while (!st.empty() && arr[st.back()] <= arr[i]) 
+                st.pop_back();
+
+            // Add current element's index
+            st.push_back(i);
+
+            // Store the maximum if the window is fully formed
+            if (i >= k - 1) 
+                ans.push_back(arr[st.front()]);
+        }
+        return ans;
+    }
+};
+```
+
+---
+
+## **🔹 Complexity Analysis**
+| **Approach** | **Time Complexity** | **Space Complexity** |
+|-------------|-----------------|----------------|
+| **Brute Force (Nested Loops)** | O(N × K) | O(1) |
+| **Deque (Optimal Approach)** | O(N) | O(K) |
+
+- **Each element is pushed and popped from the deque at most once** → O(N).  
+- **Space complexity is O(K)** (maximum K elements stored in the deque).
+
+---
+
+## **🔹 Example Walkthrough**
+### **Example 1**
+#### **Input:**
+```cpp
+arr = {1, 3, -1, -3, 5, 3, 6, 7};
+k = 3
+```
+#### **Processing Steps**
+| Index | Window | Deque (Indexes) | Maximum |
+|--------|-------------|----------------|---------|
+| 0 | `[1]` | `[0]` | - |
+| 1 | `[1, 3]` | `[1]` | - |
+| 2 | `[1, 3, -1]` | `[1, 2]` | `3` |
+| 3 | `[3, -1, -3]` | `[1, 2, 3]` | `3` |
+| 4 | `[-1, -3, 5]` | `[4]` | `5` |
+| 5 | `[-3, 5, 3]` | `[4, 5]` | `5` |
+| 6 | `[5, 3, 6]` | `[6]` | `6` |
+| 7 | `[3, 6, 7]` | `[7]` | `7` |
+
+#### **Output:**
+```cpp
+[3, 3, 5, 5, 6, 7]
+```
+
+---
+
+## **🔹 Key Takeaways**
+✅ **Deque helps efficiently track maximum elements in O(N)**.  
+✅ **Remove elements outside the window** from the front of the deque.  
+✅ **Remove smaller elements from the back** to maintain the decreasing order.  
+✅ **Works well for streaming data and large arrays**. 🚀
