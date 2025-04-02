@@ -1,0 +1,152 @@
+# **📌 The Celebrity Problem – Full Notes**  
+
+The **Celebrity Problem** is a popular **stack-based** or **two-pointer** problem related to **graphs**. It is often asked in **coding interviews**.
+
+---
+
+## **🔹 Problem Statement**  
+You are given an **N x N matrix** `M[][]`, where:  
+- `M[i][j] == 1` means **person `i` knows person `j`**.  
+- `M[i][j] == 0` means **person `i` does NOT know person `j`**.  
+
+A **celebrity** is a person who:  
+1. **Doesn’t know anyone** in the room (all `M[i][j] == 0` for that row).  
+2. **Is known by everyone else** (all `M[j][i] == 1`, except for `M[i][i]` which is `0`).  
+
+We need to **find the celebrity** or return `-1` if no celebrity exists.
+
+---
+
+## **🔹 Approach 1: Using a Stack (Optimal)**
+### **🛠 Idea**
+Since a **celebrity doesn’t know anyone** but **is known by everyone**, we can use a **stack** to eliminate non-celebrities step by step.  
+
+### **🚀 Steps**
+1. **Push all `N` people onto a stack**.
+2. **Pop two people `A` and `B`**:
+   - If `A` knows `B`, **`A` cannot be the celebrity** → Push `B` back.
+   - If `A` doesn’t know `B`, **`B` cannot be the celebrity** → Push `A` back.
+3. **After processing all pairs, only one person remains in the stack**.
+4. **Verify if the remaining person is actually a celebrity**:
+   - They should **not know anyone** (`M[celebrity][j] == 0` for all `j`).
+   - Everyone else should **know them** (`M[j][celebrity] == 1` for all `j ≠ celebrity`).
+
+---
+
+### **🔹 Code: Stack Approach**
+```cpp
+class Solution {
+public:
+    int findCelebrity(vector<vector<int>>& M, int n) {
+        stack<int> st;
+        
+        // Step 1: Push everyone onto the stack
+        for (int i = 0; i < n; i++) {
+            st.push(i);
+        }
+        
+        // Step 2: Compare pairs and eliminate non-celebrities
+        while (st.size() > 1) {
+            int A = st.top(); st.pop();
+            int B = st.top(); st.pop();
+            
+            // If A knows B, A cannot be the celebrity
+            if (M[A][B] == 1) {
+                st.push(B);
+            } 
+            // If A does not know B, B cannot be the celebrity
+            else {
+                st.push(A);
+            }
+        }
+        
+        // Step 3: Verify if the remaining person is a celebrity
+        int candidate = st.top();
+        
+        for (int i = 0; i < n; i++) {
+            if (i != candidate) {
+                if (M[candidate][i] == 1 || M[i][candidate] == 0) {
+                    return -1;
+                }
+            }
+        }
+        
+        return candidate;
+    }
+};
+```
+
+---
+
+## **🔹 Approach 2: Two Pointers (Optimal)**
+We can solve this problem **without extra space** by using **two pointers**.
+
+### **🛠 Idea**
+1. Assume `candidate = 0` initially.
+2. **Iterate through the list**:  
+   - If `candidate` **knows `i`**, `candidate` **cannot** be a celebrity → Update `candidate = i`.
+3. **Verify if `candidate` is actually a celebrity**.
+
+### **🔹 Code: Two-Pointer Approach**
+```cpp
+class Solution {
+public:
+    int findCelebrity(vector<vector<int>>& M, int n) {
+        int candidate = 0;
+
+        // Step 1: Find the celebrity candidate
+        for (int i = 1; i < n; i++) {
+            if (M[candidate][i] == 1) {
+                candidate = i;
+            }
+        }
+
+        // Step 2: Verify if candidate is a celebrity
+        for (int i = 0; i < n; i++) {
+            if (i != candidate) {
+                if (M[candidate][i] == 1 || M[i][candidate] == 0) {
+                    return -1;
+                }
+            }
+        }
+
+        return candidate;
+    }
+};
+```
+
+---
+
+## **🔹 Complexity Analysis**
+| **Approach** | **Time Complexity** | **Space Complexity** |
+|-------------|-----------------|----------------|
+| **Brute Force (O(N²))** | O(N²) | O(1) |
+| **Stack (O(N))** | O(N) | O(N) |
+| **Two-Pointer (O(N))** | O(N) | O(1) |
+
+✅ **Two-pointer method is the most efficient** because it avoids extra space usage.
+
+---
+
+## **🔹 Example Walkthrough**
+### **Example 1**
+#### **Input:**
+```cpp
+M = {{0, 1, 1}, 
+     {0, 0, 1}, 
+     {0, 0, 0}}
+```
+#### **Processing Steps**
+- **Person 0 knows Person 1 & 2 → Not a celebrity**.
+- **Person 1 knows Person 2 → Not a celebrity**.
+- **Person 2 doesn’t know anyone but is known by everyone → Celebrity**.
+
+#### **Output:** `2`
+
+---
+
+## **🔹 Key Takeaways**
+✅ **Celebrity doesn’t know anyone** but **everyone knows them**.  
+✅ **Stack method eliminates non-celebrities** step by step.  
+✅ **Two-pointer method is the most optimized** with O(N) time and O(1) space.  
+✅ **Works well in party-based problems or finding influencers in networks**. 🚀
